@@ -22,11 +22,8 @@ from blog import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
+    path('', views.post_list, name='home'),  # Make post list the default view
     path('blog/', include('blog.urls')),
-    
-    # Redirect /catalog/ to the blog homepage
-    path('catalog/', RedirectView.as_view(url='/blog/', permanent=True)),
     
     # Authentication URLs
     path('accounts/', include('django.contrib.auth.urls')),

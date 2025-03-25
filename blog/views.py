@@ -39,23 +39,30 @@ def post_list(request):
     """
     try:
         posts = Post.objects.select_related('author').all().order_by('-date_posted')
-        logger.info(f'Found {posts.count()} posts')
+        total_posts = posts.count()
+        logger.info(f'Found {total_posts} posts')
         
         # Pagination
         paginator = Paginator(posts, 5)  # Show 5 posts per page
         page_number = request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
         
-        return render(request, 'blog/post_list.html', {
+        context = {
             'title': 'All Blog Posts',
             'page_obj': page_obj,
-        })
+            'total_posts': total_posts,
+            'debug': True,  # Enable debug information
+        }
+        
+        return render(request, 'blog/post_list.html', context)
     except Exception as e:
         logger.error(f'Error in post_list view: {str(e)}', exc_info=True)
         messages.error(request, 'An error occurred while loading the posts.')
         return render(request, 'blog/post_list.html', {
             'title': 'All Blog Posts',
             'page_obj': None,
+            'total_posts': 0,
+            'debug': True,
         })
 
 def post_detail(request, post_id):
