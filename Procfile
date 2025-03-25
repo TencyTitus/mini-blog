@@ -1,2 +1,2 @@
-web: gunicorn myproject.wsgi:application
+web: gunicorn miniblog.wsgi:application
 
