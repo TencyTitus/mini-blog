@@ -10,6 +10,9 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import logging
+
+logger = logging.getLogger('blog')
 
 # Create your views here.
 def home(request):
@@ -34,17 +37,26 @@ def post_list(request):
     - Sorted by post date (newest to oldest)
     - Paginated in groups of 5 articles
     """
-    posts = Post.objects.all().order_by('-date_posted')
-    
-    # Pagination
-    paginator = Paginator(posts, 5)  # Show 5 posts per page
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
-    
-    return render(request, 'blog/post_list.html', {
-        'title': 'All Blog Posts',
-        'page_obj': page_obj,
-    })
+    try:
+        posts = Post.objects.all().order_by('-date_posted')
+        logger.debug(f'Found {posts.count()} posts')
+        
+        # Pagination
+        paginator = Paginator(posts, 5)  # Show 5 posts per page
+        page_number = request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+        
+        return render(request, 'blog/post_list.html', {
+            'title': 'All Blog Posts',
+            'page_obj': page_obj,
+        })
+    except Exception as e:
+        logger.error(f'Error in post_list view: {str(e)}')
+        messages.error(request, 'An error occurred while loading the posts.')
+        return render(request, 'blog/post_list.html', {
+            'title': 'All Blog Posts',
+            'page_obj': None,
+        })
 
 def post_detail(request, post_id):
     """
@@ -97,13 +109,22 @@ def bloggers_list(request):
     """
     View to display a list of all bloggers on the system.
     """
-    # Get all users who have at least one post, annotated with post count
-    bloggers = User.objects.annotate(post_count=Count('post')).filter(post_count__gt=0).order_by('username')
-    
-    return render(request, 'blog/bloggers_list.html', {
-        'title': 'All Bloggers',
-        'bloggers': bloggers,
-    })
+    try:
+        # Get all users who have at least one post, annotated with post count
+        bloggers = User.objects.annotate(post_count=Count('post')).filter(post_count__gt=0).order_by('username')
+        logger.debug(f'Found {bloggers.count()} bloggers')
+        
+        return render(request, 'blog/bloggers_list.html', {
+            'title': 'All Bloggers',
+            'bloggers': bloggers,
+        })
+    except Exception as e:
+        logger.error(f'Error in bloggers_list view: {str(e)}')
+        messages.error(request, 'An error occurred while loading the writers.')
+        return render(request, 'blog/bloggers_list.html', {
+            'title': 'All Bloggers',
+            'bloggers': None,
+        })
 
 @login_required
 def create_comment(request, post_id):
