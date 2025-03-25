@@ -11,6 +11,9 @@ def create_test_data(apps, schema_editor):
     Post = apps.get_model('blog', 'Post')
     Comment = apps.get_model('blog', 'Comment')
     
+    # Delete existing test data
+    Post.objects.all().delete()
+    
     # Create test users if they don't exist
     test_users_data = [
         {'username': 'JohnDoe', 'email': 'john@example.com'},
@@ -20,6 +23,7 @@ def create_test_data(apps, schema_editor):
         {'username': 'WebDev', 'email': 'web@example.com'},
     ]
     
+    # Get existing users or create new ones
     users = []
     for user_data in test_users_data:
         user, created = User.objects.get_or_create(
@@ -27,10 +31,29 @@ def create_test_data(apps, schema_editor):
             defaults={
                 'email': user_data['email'],
                 'password': make_password('testpass123'),
-                'is_active': True
+                'is_active': True,
+                'is_staff': True  # Make them staff so they can create posts
             }
         )
+        if created:
+            print(f"Created new user: {user.username}")
         users.append(user)
+    
+    # If no users were created/found, use any existing users
+    if not users:
+        users = list(User.objects.all())
+        if not users:
+            # Create at least one user if none exist
+            admin_user = User.objects.create(
+                username='admin',
+                email='admin@example.com',
+                password=make_password('admin123'),
+                is_active=True,
+                is_staff=True,
+                is_superuser=True
+            )
+            users.append(admin_user)
+            print("Created admin user")
     
     # Sample blog post content
     posts_data = [
@@ -71,29 +94,37 @@ def create_test_data(apps, schema_editor):
     ]
     
     # Create posts and comments
+    posts_created = 0
     for post_data in posts_data:
-        # Randomly select an author
-        author = random.choice(users)
-        
-        # Create post
-        post = Post.objects.create(
-            title=post_data['title'],
-            content=post_data['content'],
-            author=author,
-            date_posted=timezone.now()
-        )
-        
-        # Add random comments
-        num_comments = random.randint(2, 5)
-        for _ in range(num_comments):
-            commenter = random.choice(users)
-            comment_text = random.choice(comments_data)
-            Comment.objects.create(
-                post=post,
-                author=commenter,
-                content=comment_text,
+        try:
+            # Randomly select an author
+            author = random.choice(users)
+            
+            # Create post
+            post = Post.objects.create(
+                title=post_data['title'],
+                content=post_data['content'],
+                author=author,
                 date_posted=timezone.now()
             )
+            posts_created += 1
+            print(f"Created post: {post.title} by {author.username}")
+            
+            # Add random comments
+            num_comments = random.randint(2, 5)
+            for _ in range(num_comments):
+                commenter = random.choice(users)
+                comment_text = random.choice(comments_data)
+                Comment.objects.create(
+                    post=post,
+                    author=commenter,
+                    content=comment_text,
+                    date_posted=timezone.now()
+                )
+        except Exception as e:
+            print(f"Error creating post: {str(e)}")
+    
+    print(f"Successfully created {posts_created} posts with comments")
 
 def remove_test_data(apps, schema_editor):
     Post = apps.get_model('blog', 'Post')

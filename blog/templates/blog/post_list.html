@@ -326,7 +326,7 @@
 </div>
 
 <div class="container">
-    {% if page_obj %}
+    {% if page_obj and page_obj.object_list %}
         <div class="post-list">
             {% for post in page_obj %}
                 <article class="post-card">
@@ -430,12 +430,16 @@
         </div>
     {% else %}
         <div class="no-posts">
-            <i class="fas fa-newspaper"></i>
+            <i class="fas fa-pen-fancy"></i>
             <h3>No Articles Yet</h3>
             <p>Be the first one to share your thoughts with our community!</p>
             {% if user.is_authenticated %}
-                <a href="{% url 'post_create' %}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-pen-nib me-2"></i>Write an Article
+                <a href="{% url 'post_create' %}" class="btn btn-primary">
+                    <i class="fas fa-pen-nib me-2"></i>Write Your First Article
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In to Write
                 </a>
             {% endif %}
         </div>

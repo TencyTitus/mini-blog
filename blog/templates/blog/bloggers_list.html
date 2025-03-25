@@ -172,6 +172,50 @@
             height: 80px;
         }
     }
+
+    .no-writers {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin: 2rem 0;
+    }
+
+    .no-writers i {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .no-writers h3 {
+        font-size: 1.5rem;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+    }
+
+    .no-writers p {
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .no-writers .btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .no-writers .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+    }
 </style>
 {% endblock %}
 
@@ -182,46 +226,59 @@
         <p>Meet the creative minds behind our diverse collection of articles. Each writer brings their unique perspective and expertise to our community.</p>
     </div>
 
-    <div class="hexagon-grid">
-        {% for blogger in bloggers %}
-        <div class="writer-card" onclick="window.location='{% url 'blogger_detail' blogger.id %}'">
-            <div class="writer-avatar">
-                <div class="avatar-circle">
-                    <span class="avatar-text">{{ blogger.username|slice:":1"|upper }}</span>
-                </div>
-            </div>
-            <div class="writer-info">
-                <h3 class="writer-name">{{ blogger.username }}</h3>
-                <div class="writer-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">{{ blogger.post_set.count }}</div>
-                        <div class="stat-label">Articles</div>
+    {% if bloggers %}
+        <div class="hexagon-grid">
+            {% for blogger in bloggers %}
+                <div class="writer-card" onclick="window.location='{% url 'blogger_detail' blogger.id %}'">
+                    <div class="writer-avatar">
+                        <div class="avatar-circle">
+                            <span class="avatar-text">{{ blogger.username|slice:":1"|upper }}</span>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{{ blogger.date_joined|date:"M Y" }}</div>
-                        <div class="stat-label">Joined</div>
+                    <div class="writer-info">
+                        <h3 class="writer-name">{{ blogger.username }}</h3>
+                        <div class="writer-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">{{ blogger.post_set.count }}</div>
+                                <div class="stat-label">Articles</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">{{ blogger.date_joined|date:"M Y" }}</div>
+                                <div class="stat-label">Joined</div>
+                            </div>
+                        </div>
+                        <a href="{% url 'blogger_detail' blogger.id %}" class="writer-link">
+                            <i class="fas fa-user me-2"></i>View Profile
+                        </a>
                     </div>
                 </div>
-                <a href="{% url 'blogger_detail' blogger.id %}" class="writer-link">
-                    <i class="fas fa-user me-2"></i>View Profile
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-writers">
+            <i class="fas fa-users"></i>
+            <h3>No Writers Yet</h3>
+            <p>Be the first to join our writing community and share your stories!</p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'post_create' %}" class="btn btn-primary">
+                    <i class="fas fa-pen-nib me-2"></i>Start Writing
                 </a>
-            </div>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-2"></i>Join Our Community
+                </a>
+            {% endif %}
         </div>
-        {% empty %}
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i>No writers found.
-        </div>
-        {% endfor %}
-    </div>
+    {% endif %}
 
     {% if not user.is_authenticated %}
-    <div class="join-banner">
-        <h3 class="mb-3">Want to Join Our Writing Community?</h3>
-        <p class="mb-4">Share your thoughts, connect with readers, and become part of our growing community.</p>
-        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
-            <i class="fas fa-pen-fancy me-2"></i>Start Writing Today
-        </a>
-    </div>
+        <div class="join-banner">
+            <h3>Want to Join Our Writing Community?</h3>
+            <p>Share your thoughts, connect with readers, and become part of our growing community.</p>
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-pen-fancy me-2"></i>Start Writing Today
+            </a>
+        </div>
     {% endif %}
 </div>
 {% endblock %} 
