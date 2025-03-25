@@ -1,29 +1,25 @@
 services:
   - type: web
-    name: mini-blog
+    name: miniblog
     env: python
-    buildCommand: |
-      pip install -r requirements.txt
-      python manage.py collectstatic --noinput
-    startCommand: |
-      python manage.py migrate
-      gunicorn miniblog.wsgi:application
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    startCommand: gunicorn miniblog.wsgi:application
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.7
+        value: 3.11.3
+      - key: DJANGO_DEBUG
+        value: False
       - key: DJANGO_SECRET_KEY
         generateValue: true
-      - key: DJANGO_DEBUG
-        value: false
-      - key: ALLOWED_HOSTS
-        value: ".onrender.com"
       - key: DATABASE_URL
         fromDatabase:
-          name: mini-blog-db
+          name: miniblog-db
           property: connectionString
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
     staticPublishPath: ./staticfiles
 
 databases:
-  - name: mini-blog-db
-    plan: free
+  - name: miniblog-db
+    databaseName: miniblog
     ipAllowList: [] 
