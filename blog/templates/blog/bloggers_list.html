@@ -1,0 +1,227 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}All Writers - Mini Blog{% endblock %}
+
+{% block extra_css %}
+<style>
+    .writers-container {
+        padding: 2rem 0;
+    }
+
+    .writers-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        position: relative;
+    }
+
+    .writers-header h1 {
+        font-size: 2.5rem;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .writers-header p {
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .hexagon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        padding: 1rem;
+    }
+
+    .writer-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.4s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .writer-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        opacity: 0;
+        transition: all 0.4s ease;
+        z-index: 0;
+    }
+
+    .writer-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .writer-card:hover::before {
+        opacity: 0.1;
+    }
+
+    .writer-avatar {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .avatar-circle {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: white;
+        font-weight: 600;
+        transform: rotate(45deg);
+        transition: all 0.4s ease;
+    }
+
+    .avatar-text {
+        transform: rotate(-45deg);
+    }
+
+    .writer-card:hover .avatar-circle {
+        transform: rotate(225deg);
+    }
+
+    .writer-info {
+        position: relative;
+        z-index: 1;
+    }
+
+    .writer-name {
+        font-size: 1.25rem;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .writer-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .stat-item {
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .writer-link {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 12px;
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .writer-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+        color: white;
+    }
+
+    .join-banner {
+        margin-top: 4rem;
+        text-align: center;
+        padding: 3rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .hexagon-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .writer-avatar {
+            width: 80px;
+            height: 80px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="writers-container">
+    <div class="writers-header">
+        <h1>Our Amazing Writers</h1>
+        <p>Meet the creative minds behind our diverse collection of articles. Each writer brings their unique perspective and expertise to our community.</p>
+    </div>
+
+    <div class="hexagon-grid">
+        {% for blogger in bloggers %}
+        <div class="writer-card" onclick="window.location='{% url 'blogger_detail' blogger.id %}'">
+            <div class="writer-avatar">
+                <div class="avatar-circle">
+                    <span class="avatar-text">{{ blogger.username|slice:":1"|upper }}</span>
+                </div>
+            </div>
+            <div class="writer-info">
+                <h3 class="writer-name">{{ blogger.username }}</h3>
+                <div class="writer-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ blogger.post_set.count }}</div>
+                        <div class="stat-label">Articles</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ blogger.date_joined|date:"M Y" }}</div>
+                        <div class="stat-label">Joined</div>
+                    </div>
+                </div>
+                <a href="{% url 'blogger_detail' blogger.id %}" class="writer-link">
+                    <i class="fas fa-user me-2"></i>View Profile
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>No writers found.
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not user.is_authenticated %}
+    <div class="join-banner">
+        <h3 class="mb-3">Want to Join Our Writing Community?</h3>
+        <p class="mb-4">Share your thoughts, connect with readers, and become part of our growing community.</p>
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-pen-fancy me-2"></i>Start Writing Today
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

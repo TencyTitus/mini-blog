@@ -1,0 +1,518 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .post-hero {
+        position: relative;
+        padding: 6rem 0 4rem;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 0 0 3rem 3rem;
+        overflow: hidden;
+        margin-bottom: 4rem;
+    }
+
+    .post-hero::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.3;
+    }
+
+    .post-meta-header {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        color: white;
+    }
+
+    .post-category {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .post-title-large {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 2rem;
+        line-height: 1.2;
+    }
+
+    .post-meta-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        font-size: 0.95rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .meta-item i {
+        opacity: 0.8;
+    }
+
+    .post-content-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .post-author-card {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 2rem;
+        background: var(--surface-color);
+        border-radius: 1.5rem;
+        margin-bottom: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .author-avatar-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        position: relative;
+    }
+
+    .author-avatar-large::after {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        border-radius: 50%;
+        border: 2px solid var(--primary-color);
+        opacity: 0.5;
+        animation: pulse 2s infinite;
+    }
+
+    .author-info-large {
+        flex-grow: 1;
+    }
+
+    .author-name-large {
+        font-size: 1.5rem;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .author-bio {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .post-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-color);
+        margin-bottom: 3rem;
+    }
+
+    .post-content p {
+        margin-bottom: 1.5rem;
+    }
+
+    .post-actions-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2rem;
+        background: var(--surface-color);
+        border-radius: 1.5rem;
+        margin: 3rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-action {
+        padding: 0.75rem 1.5rem;
+        border-radius: 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-like {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-like:hover {
+        background: rgba(239, 68, 68, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .btn-liked {
+        background: #ef4444;
+        color: white;
+        border: none;
+    }
+
+    .btn-liked:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+    }
+
+    .btn-share {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-muted);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-share:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+        transform: translateY(-2px);
+    }
+
+    .post-stats {
+        display: flex;
+        gap: 1.5rem;
+        color: var(--text-muted);
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .comments-section {
+        margin-top: 4rem;
+    }
+
+    .comments-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .comments-title {
+        font-size: 1.5rem;
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .comment-count {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--primary-color);
+        padding: 0.25rem 1rem;
+        border-radius: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .comment-card {
+        background: var(--surface-color);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .comment-author {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .comment-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+    }
+
+    .comment-meta {
+        flex-grow: 1;
+    }
+
+    .comment-name {
+        color: var(--text-color);
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .comment-date {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+    }
+
+    .comment-content {
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+
+    .comment-form {
+        background: var(--surface-color);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        margin-top: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .comment-form textarea {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 1rem;
+        color: var(--text-color);
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .comment-form textarea:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        background: rgba(255, 255, 255, 0.07);
+    }
+
+    .btn-submit-comment {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit-comment:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: scale(1.05);
+            opacity: 0.25;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .post-title-large {
+            font-size: 2.5rem;
+        }
+
+        .post-meta-info {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .post-author-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .post-actions-bar {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .action-buttons {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .post-stats {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<article>
+    <div class="post-hero">
+        <div class="post-meta-header">
+            <span class="post-category">Article</span>
+            <h1 class="post-title-large">{{ post.title }}</h1>
+            <div class="post-meta-info">
+                <div class="meta-item">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Written by {{ post.author.username }}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="far fa-calendar-alt"></i>
+                    <span>{{ post.date_posted|date:"F d, Y" }}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="far fa-clock"></i>
+                    <span>{{ post.date_posted|timesince }} ago</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-content-wrapper">
+        <div class="post-author-card">
+            <div class="author-avatar-large">
+                {{ post.author.username|slice:":1"|upper }}
+            </div>
+            <div class="author-info-large">
+                <h2 class="author-name-large">{{ post.author.username }}</h2>
+                <p class="author-bio">
+                    Contributing writer at Mini Blog. Joined {{ post.author.date_joined|date:"F Y" }}.
+                    {% if post.author.email %}
+                    Contact at {{ post.author.email }}.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="post-content">
+            {{ post.content|linebreaks }}
+        </div>
+
+        <div class="post-actions-bar">
+            <div class="action-buttons">
+                {% if user.is_authenticated %}
+                    {% if user in post.likes.all %}
+                        <a href="{% url 'like_post' post.id %}" class="btn btn-action btn-liked">
+                            <i class="fas fa-heart"></i>
+                            <span>Liked</span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'like_post' post.id %}" class="btn btn-action btn-like">
+                            <i class="far fa-heart"></i>
+                            <span>Like</span>
+                        </a>
+                    {% endif %}
+                    <button class="btn btn-action btn-share">
+                        <i class="fas fa-share"></i>
+                        <span>Share</span>
+                    </button>
+                    {% if user == post.author %}
+                        <a href="{% url 'post_update' post.id %}" class="btn btn-action btn-edit">
+                            <i class="fas fa-edit"></i>
+                            <span>Edit</span>
+                        </a>
+                        <a href="{% url 'post_delete' post.id %}" class="btn btn-action btn-delete">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Delete</span>
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="post-stats">
+                <span class="stat-item">
+                    <i class="far fa-heart"></i>
+                    <span>{{ post.likes.count }} likes</span>
+                </span>
+                <span class="stat-item">
+                    <i class="far fa-comment"></i>
+                    <span>{{ post.comments.count }} comments</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="comments-section">
+            <div class="comments-header">
+                <h3 class="comments-title">
+                    <i class="far fa-comments"></i>
+                    Comments
+                    <span class="comment-count">{{ post.comments.count }}</span>
+                </h3>
+            </div>
+
+            {% if post.comments.all %}
+                {% for comment in post.comments.all %}
+                    <div class="comment-card">
+                        <div class="comment-author">
+                            <div class="comment-avatar">
+                                {{ comment.author.username|slice:":1"|upper }}
+                            </div>
+                            <div class="comment-meta">
+                                <div class="comment-name">{{ comment.author.username }}</div>
+                                <div class="comment-date">
+                                    <i class="far fa-clock me-1"></i>
+                                    {{ comment.date_posted|timesince }} ago
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comment-content">
+                            {{ comment.content|linebreaks }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="comment-card text-center">
+                    <i class="far fa-comment-dots mb-3" style="font-size: 2rem; color: var(--text-muted);"></i>
+                    <p class="mb-0">No comments yet. Be the first to share your thoughts!</p>
+                </div>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <form method="POST" class="comment-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Add a comment</label>
+                        {{ comment_form.content }}
+                    </div>
+                    <button type="submit" class="btn btn-submit-comment">
+                        <i class="fas fa-paper-plane me-2"></i>Post Comment
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</article>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Remove the previous like button JavaScript
+</script>
+{% endblock %} 

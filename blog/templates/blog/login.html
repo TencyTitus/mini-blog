@@ -1,0 +1,33 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Redirecting...{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">
+                    <i class="fas fa-sync me-2"></i>Redirecting
+                </h3>
+            </div>
+            <div class="card-body p-4 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem;"></i>
+                </div>
+                <h4 class="mb-3">Please wait</h4>
+                <p class="mb-4">You are being redirected to the login page...</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'login' %}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Click here if you are not redirected
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.location.href = "{% url 'login' %}";
+</script>
+{% endblock %} 

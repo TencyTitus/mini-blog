@@ -1,0 +1,265 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .writers-header {
+        padding: 4rem 0;
+        text-align: center;
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        margin-bottom: 4rem;
+        border-radius: 0 0 3rem 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .writers-header::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .writers-title {
+        font-size: 3.5rem;
+        color: white;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .writers-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .writer-card {
+        background: var(--surface-color);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .writer-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        border-color: var(--primary-color);
+    }
+
+    .writer-header {
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .writer-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        position: relative;
+    }
+
+    .writer-avatar::after {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        border-radius: 50%;
+        border: 2px solid var(--primary-color);
+        opacity: 0.5;
+        animation: pulse 2s infinite;
+    }
+
+    .writer-name {
+        font-size: 1.5rem;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .writer-name a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .writer-name a:hover {
+        color: var(--primary-color);
+    }
+
+    .writer-meta {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .writer-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-box {
+        text-align: center;
+        padding: 1rem;
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        transition: all 0.3s ease;
+    }
+
+    .stat-box:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+    }
+
+    .writer-footer {
+        padding: 1.5rem;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-profile {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-profile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: scale(1.05);
+            opacity: 0.25;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+    }
+
+    .no-writers {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--surface-color);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .no-writers i {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .no-writers h3 {
+        color: var(--text-color);
+        margin-bottom: 1rem;
+    }
+
+    .no-writers p {
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="writers-header">
+    <h1 class="writers-title">Our Writers</h1>
+    <p class="writers-subtitle">Meet the creative minds behind our stories</p>
+</div>
+
+<div class="container">
+    {% if writers %}
+    <div class="row g-4">
+        {% for writer in writers %}
+        <div class="col-md-6 col-lg-4">
+            <div class="writer-card">
+                <div class="writer-header">
+                    <div class="writer-avatar">
+                        {{ writer.username|slice:":1"|upper }}
+                    </div>
+                    <h2 class="writer-name">
+                        <a href="{% url 'blogger_detail' writer.id %}">{{ writer.username }}</a>
+                    </h2>
+                    <div class="writer-meta">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Joined {{ writer.date_joined|date:"F Y" }}
+                    </div>
+                </div>
+                <div class="writer-stats">
+                    <div class="stat-box">
+                        <div class="stat-value">{{ writer.post_set.count }}</div>
+                        <div class="stat-label">Articles</div>
+                    </div>
+                    <div class="stat-box">
+                        {% with comment_count=0 %}
+                            {% for post in writer.post_set.all %}
+                                {% with comment_count=comment_count|add:post.comments.count %}{% endwith %}
+                            {% endfor %}
+                            <div class="stat-value">{{ comment_count }}</div>
+                            <div class="stat-label">Comments</div>
+                        {% endwith %}
+                    </div>
+                </div>
+                <div class="writer-footer">
+                    <a href="{% url 'blogger_detail' writer.id %}" class="btn btn-profile">
+                        <i class="fas fa-user me-2"></i>View Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-writers">
+        <i class="fas fa-users"></i>
+        <h3>No Writers Yet</h3>
+        <p>Be the first one to join our writing community!</p>
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-user-plus me-2"></i>Join as Writer
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 
